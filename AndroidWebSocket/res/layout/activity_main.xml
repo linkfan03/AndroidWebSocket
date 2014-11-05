@@ -8,11 +8,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <WebView
-        android:id="@+id/webview"
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" 
-        tools:context=".MainActivity" />
+        android:id="@+id/driverButton"
+        android:text="Driver"
+        android:layout_marginTop="166dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/signalButton"
+        android:text="Signal"
+        android:layout_marginTop="53dp"
+        android:layout_below="@+id/driverButton"
+        android:layout_alignLeft="@+id/driverButton" />
 
 </RelativeLayout>
