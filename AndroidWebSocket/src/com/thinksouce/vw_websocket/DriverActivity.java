@@ -33,7 +33,7 @@ public class DriverActivity extends Activity {
         });
         wv.loadUrl("file:///android_asset/www/chat.html");
         wv.addJavascriptInterface(new WebSocketFactory(wv, this), "WebSocketFactory");//The string name is the string used for the javascript that is going to call Android native code
-        wv.setVisibility(View.GONE);
+        //wv.setVisibility(View.GONE);
     }
 
     @Override

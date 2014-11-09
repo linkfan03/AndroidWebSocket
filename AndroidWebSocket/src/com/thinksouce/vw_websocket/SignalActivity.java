@@ -1,23 +1,41 @@
 package com.thinksouce.vw_websocket;
 
 import android.app.Activity;
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.strumsoft.websocket.phonegap.WebSocketFactory;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 /**
  * Created by Josh on 11/4/2014.
  */
-public class SignalActivity extends Activity {
+public class SignalActivity extends Activity implements LocationListener {
+    private TextView latitudeField;
+    private TextView longitudeField;
+    private TextView directionField;
+    private LocationManager locationManager;
+    private String provider;
+    private WebView wv;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signal);
-        WebView wv = (WebView) findViewById(R.id.webview);
+        wv = (WebView) findViewById(R.id.webview);
         wv.getSettings().setJavaScriptEnabled(true);
         wv.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
@@ -33,8 +51,89 @@ public class SignalActivity extends Activity {
         wv.loadUrl("file:///android_asset/www/chat.html");
         wv.addJavascriptInterface(new WebSocketFactory(wv, this), "WebSocketFactory");//The string name is the string used for the javascript that is going to call Android native code
         wv.setVisibility(View.GONE);
+        latitudeField = (TextView) findViewById(R.id.TextView02);
+        longitudeField = (TextView) findViewById(R.id.TextView04);
+        //directionField = (TextView) findViewById(R.id.TextView06);
+        // Get the location manager
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        // Define the criteria how to select the location provider -> use
+        Criteria criteria = new Criteria();
+        provider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(provider);
+        // Initialize the location fields
+        if (location != null) {
+            System.out.println("Provider " + provider + " has been selected.");
+            onLocationChanged(location);
+            // get rid of bottom line to fix
+            //Toast.makeText(context, "Current Speed:" + location.getSpeed(), Toast.LENGTH_SHORT).show();
+        } else {
+            latitudeField.setText("Location not available");
+            longitudeField.setText("Location not available");
+            directionField.setText("Direction not available");
+        }
+
     }
 
+    // Request updates at startup
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locationManager.requestLocationUpdates(provider, 400, 1, this);
+    }
+
+    /* Remove the locationlistener updates when Activity is paused */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(this);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        double lat = (double) (location.getLatitude());
+        double lng = (double) (location.getLongitude());
+        latitudeField.setText(String.valueOf(lat));
+        longitudeField.setText(String.valueOf(lng));
+        Toast.makeText(this, "Current speed:" + location.getSpeed(), Toast.LENGTH_SHORT).show();
+        HashMap<String,String> locationMap = new HashMap<String, String>();
+        locationMap.put("latitude", String.valueOf(location.getLatitude()));
+        locationMap.put("longitude", String.valueOf(location.getLongitude()));
+        locationMap.put("current_speed", String.valueOf(location.getSpeed()));
+        JSONObject locationJsonObject = new JSONObject(locationMap);
+        String locationJson = locationJsonObject.toString();
+        wv.loadUrl("javascript:doSend('" + locationJson + "')");
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Toast.makeText(this, "Enabled new provider " + provider,
+                Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(this, "Disabled provider " + provider,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    protected static double bearing(double lat1, double lon1, double lat2, double lon2){
+        double longitude1 = lon1;
+        double longitude2 = lon2;
+        double latitude1 = Math.toRadians(lat1);
+        double latitude2 = Math.toRadians(lat2);
+        double longDiff= Math.toRadians(longitude2-longitude1);
+        double y= Math.sin(longDiff)*Math.cos(latitude2);
+        double x=Math.cos(latitude1)*Math.sin(latitude2)-Math.sin(latitude1)*Math.cos(latitude2)*Math.cos(longDiff);
+        return (Math.toDegrees(Math.atan2(y, x))+360)%360;
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

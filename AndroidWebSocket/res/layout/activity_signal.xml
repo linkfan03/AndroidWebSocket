@@ -6,13 +6,91 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".SignalActivity" >
+    tools:context=".SignalActivity"
+    android:background="#ffff3f4d">
 
-    <WebView
-        android:id="@+id/webview"
+<LinearLayout
+    android:id="@+id/linearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="40dip"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:id="@+id/TextView01"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="5dip"
+        android:text="Latitude: "
+        android:textSize="20dip"
+        android:textColor="#ffffffff">
+    </TextView>
+
+    <TextView
+        android:id="@+id/TextView02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unknown"
+        android:textSize="20dip" >
+    </TextView>
+</LinearLayout>
+
+<LinearLayout
+    android:id="@+id/linearLayout2"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/TextView03"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="5dip"
+        android:text="Longitude: "
+        android:textSize="20dip"
+        android:textColor="#ffffffff">
+    </TextView>
+
+    <TextView
+        android:id="@+id/TextView04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unknown"
+        android:textSize="20dip" >
+    </TextView>
+
+</LinearLayout>
+<!--
+<LinearLayout
+    android:id="@+id/linearLayout3"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/TextView05"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="5dip"
+        android:text="Direction: "
+        android:textSize="20dip"
+        android:textColor="#ffffffff">
+    </TextView>
+
+    <TextView
+        android:id="@+id/TextView06"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unknown"
+        android:textSize="20dip" >
+    </TextView>
+    -->
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:text="@string/hello_world"
         tools:context=".SignalActivity" />
-
+<!--</LinearLayout>-->
 </RelativeLayout>
