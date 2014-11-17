@@ -15,14 +15,18 @@ import android.widget.Button;
 
 public class MainActivity extends Activity {
     Button driverButton;
-    Button signalButton;
+    Button studentButton;
+    Button bicycleButton;
+    Button roadWorkerButton;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         driverButton = (Button)findViewById(R.id.driverButton);
-        signalButton = (Button)findViewById(R.id.signalButton);
+        studentButton = (Button)findViewById(R.id.studentButton);
+        bicycleButton = (Button)findViewById(R.id.bicycleButton);
+        roadWorkerButton = (Button)findViewById(R.id.roadWorkerButton);
         final Intent driverIntent = new Intent(this, DriverActivity.class);
         final Intent signalIntent = new Intent(this, SignalActivity.class);
         driverButton.setOnClickListener(new View.OnClickListener() {
@@ -31,13 +35,27 @@ public class MainActivity extends Activity {
                 startActivity(driverIntent);
             }
         });
-        signalButton.setOnClickListener(new View.OnClickListener() {
+        studentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                signalIntent.putExtra("signalType", SignalType.Student.toInt());
                 startActivity(signalIntent);
             }
         });
-		
+        bicycleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signalIntent.putExtra("signalType", SignalType.BicycleRider.toInt());
+                startActivity(signalIntent);
+            }
+        });
+        roadWorkerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signalIntent.putExtra("signalType", SignalType.RoadWorker.toInt());
+                startActivity(signalIntent);
+            }
+        });
     }
 
 	@Override

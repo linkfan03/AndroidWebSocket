@@ -2,6 +2,7 @@ package com.thinksouce.vw_websocket;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -28,12 +29,19 @@ import java.util.HashMap;
 public class SignalActivity extends Activity implements LocationListener {
     private TextView latitudeField;
     private TextView longitudeField;
-    private TextView directionField;
     private LocationManager locationManager;
     private String provider;
     private WebView wv;
+    private Location lastBroadcastedLocation;
+    private SignalType signalType;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        signalType = SignalType.values()[intent.getIntExtra("signalType", 0)];
+
+
         setContentView(R.layout.activity_signal);
         wv = (WebView) findViewById(R.id.webview);
         wv.getSettings().setJavaScriptEnabled(true);
@@ -69,7 +77,6 @@ public class SignalActivity extends Activity implements LocationListener {
         } else {
             latitudeField.setText("Location not available");
             longitudeField.setText("Location not available");
-            directionField.setText("Direction not available");
         }
 
     }
@@ -90,19 +97,26 @@ public class SignalActivity extends Activity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        double lat = (double) (location.getLatitude());
-        double lng = (double) (location.getLongitude());
-        latitudeField.setText(String.valueOf(lat));
-        longitudeField.setText(String.valueOf(lng));
-        Toast.makeText(this, "Current speed:" + location.getSpeed(), Toast.LENGTH_SHORT).show();
-        HashMap<String,String> locationMap = new HashMap<String, String>();
-        locationMap.put("latitude", String.valueOf(location.getLatitude()));
-        locationMap.put("longitude", String.valueOf(location.getLongitude()));
-        locationMap.put("current_speed", String.valueOf(location.getSpeed()));
-        JSONObject locationJsonObject = new JSONObject(locationMap);
-        String locationJson = locationJsonObject.toString();
-        wv.loadUrl("javascript:doSend('" + locationJson + "')");
-
+        if(lastBroadcastedLocation == null || location.getTime() - lastBroadcastedLocation.getTime() >= 60000 || location.distanceTo(lastBroadcastedLocation) >= 15.00) {
+            //only broadcast new location if no location has been sent before
+            //or it has been 1 minute since last broadcast
+            //or the signal phone has moved 15 meters since last broadcast
+            double lat = (double) (location.getLatitude());
+            double lng = (double) (location.getLongitude());
+            latitudeField.setText(String.valueOf(lat));
+            longitudeField.setText(String.valueOf(lng));
+            Toast.makeText(this, "Current speed:" + location.getSpeed(), Toast.LENGTH_SHORT).show();
+            HashMap<String, String> locationMap = new HashMap<String, String>();
+            locationMap.put("latitude", String.valueOf(location.getLatitude()));
+            locationMap.put("longitude", String.valueOf(location.getLongitude()));
+            locationMap.put("current_speed", String.valueOf(location.getSpeed()));
+            locationMap.put("bearing", String.valueOf(location.getBearing()));
+            locationMap.put("signalType", String.valueOf(signalType.toInt()));
+            JSONObject locationJsonObject = new JSONObject(locationMap);
+            String locationJson = locationJsonObject.toString();
+            wv.loadUrl("javascript:doSend('" + locationJson + "')");
+            lastBroadcastedLocation = location;
+        }
     }
 
     @Override
