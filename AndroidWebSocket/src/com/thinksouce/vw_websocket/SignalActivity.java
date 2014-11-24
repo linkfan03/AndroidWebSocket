@@ -86,6 +86,26 @@ public class SignalActivity extends Activity implements LocationListener {
     protected void onResume() {
         super.onResume();
         locationManager.requestLocationUpdates(provider, 400, 1, this);
+
+        if(lastBroadcastedLocation == null || location.getTime()-lastBroadcastedLocation.getTime()>= 60000) {
+            double lat = (double) (location.getLatitude());
+            double lng = (double) (location.getLongitude());
+            latitudeField.setText(String.valueOf(lat));
+            longitudeField.setText(String.valueOf(lng));
+            Toast.makeText(this, "Current speed:" + location.getSpeed(), Toast.LENGTH_SHORT).show();
+            HashMap<String, String> locationMap = new HashMap<String, String>();
+            locationMap.put("latitude", String.valueOf(location.getLatitude()));
+            locationMap.put("longitude", String.valueOf(location.getLongitude()));
+            locationMap.put("current_speed", String.valueOf(location.getSpeed()));
+            locationMap.put("bearing", String.valueOf(location.getBearing()));
+            locationMap.put("signalType", String.valueOf(signalType.toInt()));
+            JSONObject locationJsonObject = new JSONObject(locationMap);
+            String locationJson = locationJsonObject.toString();
+            wv.loadUrl("javascript:doSend('" + locationJson + "')");
+            lastBroadcastedLocation = location;
+
+        }
+        }
     }
 
     /* Remove the locationlistener updates when Activity is paused */
@@ -97,7 +117,7 @@ public class SignalActivity extends Activity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        if(lastBroadcastedLocation == null || location.getTime() - lastBroadcastedLocation.getTime() >= 60000 || location.distanceTo(lastBroadcastedLocation) >= 15.00) {
+        if(location.distanceTo(lastBroadcastedLocation) >= 15.00) {
             //only broadcast new location if no location has been sent before
             //or it has been 1 minute since last broadcast
             //or the signal phone has moved 15 meters since last broadcast
