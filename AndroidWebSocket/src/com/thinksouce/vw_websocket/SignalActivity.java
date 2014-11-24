@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.View;
@@ -22,6 +23,10 @@ import com.strumsoft.websocket.phonegap.WebSocketFactory;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.UUID;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Josh on 11/4/2014.
@@ -34,6 +39,9 @@ public class SignalActivity extends Activity implements LocationListener {
     private WebView wv;
     private Location lastBroadcastedLocation;
     private SignalType signalType;
+    private UUID deviceID = UUID.randomUUID();
+    private long lastBroadcastedTime;
+    private boolean done = false;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,19 +96,33 @@ public class SignalActivity extends Activity implements LocationListener {
         locationManager.requestLocationUpdates(provider, 400, 1, this);
     }
 
+
+    public Location createNewLocation (Location location){
+        //Create new location with the current time using the last broadcasted location
+        //This will be used to determine if it is time to broadcast the location again
+        Location newLocation = new Location(location);
+        newLocation.setTime(System.currentTimeMillis());
+        return newLocation;
+    }
+
     /* Remove the locationlistener updates when Activity is paused */
     @Override
     protected void onPause() {
+        done = true;
         super.onPause();
         locationManager.removeUpdates(this);
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        if(lastBroadcastedLocation == null || location.getTime() - lastBroadcastedLocation.getTime() >= 60000 || location.distanceTo(lastBroadcastedLocation) >= 15.00) {
+        sendLocation(location);
+    }
+
+    public void sendLocation(Location location){
+        if(location != null && (lastBroadcastedLocation == null || location.getTime() - lastBroadcastedLocation.getTime() >= 60000 || location.distanceTo(lastBroadcastedLocation) >= 10.00)) {
             //only broadcast new location if no location has been sent before
             //or it has been 1 minute since last broadcast
-            //or the signal phone has moved 15 meters since last broadcast
+            //or the signal phone has moved 10 meters since last broadcast
             double lat = (double) (location.getLatitude());
             double lng = (double) (location.getLongitude());
             latitudeField.setText(String.valueOf(lat));
@@ -112,6 +134,7 @@ public class SignalActivity extends Activity implements LocationListener {
             locationMap.put("current_speed", String.valueOf(location.getSpeed()));
             locationMap.put("bearing", String.valueOf(location.getBearing()));
             locationMap.put("signalType", String.valueOf(signalType.toInt()));
+            locationMap.put("deviceID", String.valueOf(deviceID));
             JSONObject locationJsonObject = new JSONObject(locationMap);
             String locationJson = locationJsonObject.toString();
             wv.loadUrl("javascript:doSend('" + locationJson + "')");
