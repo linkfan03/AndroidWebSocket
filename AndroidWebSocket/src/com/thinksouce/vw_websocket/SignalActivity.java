@@ -23,6 +23,8 @@ import com.strumsoft.websocket.phonegap.WebSocketFactory;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -41,7 +43,6 @@ public class SignalActivity extends Activity implements LocationListener {
     private SignalType signalType;
     private UUID deviceID = UUID.randomUUID();
     private long lastBroadcastedTime;
-    private boolean done = false;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +87,12 @@ public class SignalActivity extends Activity implements LocationListener {
             latitudeField.setText("Location not available");
             longitudeField.setText("Location not available");
         }
-
+        wv.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sendLocation(createNewLocation(lastBroadcastedLocation));
+            }
+        }, 10000);
     }
 
     // Request updates at startup
@@ -141,6 +147,7 @@ public class SignalActivity extends Activity implements LocationListener {
             lastBroadcastedLocation = location;
         }
     }
+
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
