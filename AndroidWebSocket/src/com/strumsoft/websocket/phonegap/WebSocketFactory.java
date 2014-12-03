@@ -97,9 +97,9 @@ public class WebSocketFactory {
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
         if(first){
             first = false;
-//            appView.loadUrl("javascript:doSend('1')");//How to call javascript code from Android
-//            appView.loadUrl("javascript:doSend('2')");
-//            appView.loadUrl("javascript:doSend('3')");
+            appView.loadUrl("javascript:doSend('1')");//How to call javascript code from Android
+            appView.loadUrl("javascript:doSend('2')");
+            appView.loadUrl("javascript:doSend('3')");
 
         }
     }
