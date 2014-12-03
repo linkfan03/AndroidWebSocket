@@ -114,7 +114,7 @@ public class SignalActivity extends Activity implements LocationListener {
     /* Remove the locationlistener updates when Activity is paused */
     @Override
     protected void onPause() {
-        done = true;
+        
         super.onPause();
         locationManager.removeUpdates(this);
     }
