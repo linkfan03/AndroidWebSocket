@@ -3,11 +3,11 @@
 <script language="javascript" type="text/javascript">  
 //var wsUri = "ws://echo.websocket.org/";
 var wsUri = "ws://smartx-websocket.azurewebsites.net/MSWSChatHandler.ashx";//IP address will need be changed to yours you can find this by ipconfig command
-var output;  
+var output;
 function init() { 
 	output = document.getElementById("output"); 
 	testWebSocket(); 
-	}  
+}
 function testWebSocket() { 
 	websocket = new WebSocket(wsUri); 
 	websocket.onopen = function(evt) { onOpen(evt) }; 
@@ -46,6 +46,9 @@ function writeToScreen(message) {
 	pre.innerHTML = message; output.appendChild(pre);
 }
 function showAndroidToast(toast) {
+        if(toast.indexOf("Welcome") != 0){
+            WebSocketFactory.addToHazardSignalList(toast);
+        }
         WebSocketFactory.showToast(toast);//Native code call (notice "WebSocketFactory" is the name used for the javascript interface
 }
 window.addEventListener("load", init, false);  

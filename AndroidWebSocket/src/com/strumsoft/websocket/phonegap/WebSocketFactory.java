@@ -27,12 +27,21 @@
 package com.strumsoft.websocket.phonegap;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import android.content.Context;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
+
+import com.thinksouce.vw_websocket.HazardSignal;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * The <tt>WebSocketFactory</tt> is like a helper class to instantiate new
@@ -48,6 +57,8 @@ public class WebSocketFactory {
     Context mContext;
     boolean first = true;
     private String toast;
+
+    public List<HazardSignal> hazardSignalList = new ArrayList<HazardSignal>();
 
     /**
 	 * Instantiates a new web socket factory.
@@ -90,18 +101,47 @@ public class WebSocketFactory {
 		return "WEBSOCKET." + new Random().nextInt(100);
 	}
 
+    public void addToHazardSignalList(String hazardSignalJSON) throws JSONException{
+        try {
+            JSONObject jsonObject = new JSONObject(hazardSignalJSON);
+            HazardSignal hazardSignal = new HazardSignal(jsonObject);
+            HazardSignal oldHazardSignal = selectHazardSignalByDeviceID(hazardSignal.deviceID);
+            if (oldHazardSignal == null) {
+                hazardSignalList.add(hazardSignal);
+            } else {
+                oldHazardSignal = hazardSignal;
+            }
+            Log.d("HazardList", "Hazard List Size: " + hazardSignalList.size());
+        }
+        catch (Exception exception){
+            //don't crash
+            Log.d("HazardList", exception.getMessage());
+        }
+    }
+
+    public HazardSignal selectHazardSignalByDeviceID(UUID deviceID){
+        for(int i = 0; i < hazardSignalList.size(); i++){
+            if(hazardSignalList.get(i).deviceID == deviceID){
+                return hazardSignalList.get(i);
+            }
+        }
+        return null;
+    }
+
+    public List<HazardSignal> getHazardSignals(){
+        for(int i = 0; i < hazardSignalList.size(); i++){
+            if(System.currentTimeMillis() - hazardSignalList.get(i).dateTime > 100000){
+                hazardSignalList.remove(i);
+            }
+        }
+        return hazardSignalList;
+    }
+
     /** Show a toast from the web page */
     @JavascriptInterface//You have to have this for the javascript to be able to call the method
     public void showToast(String toast) {
         this.toast = toast;
         Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
-        if(first){
-            first = false;
-            appView.loadUrl("javascript:doSend('1')");//How to call javascript code from Android
-            appView.loadUrl("javascript:doSend('2')");
-            appView.loadUrl("javascript:doSend('3')");
-
-        }
     }
 
 }
