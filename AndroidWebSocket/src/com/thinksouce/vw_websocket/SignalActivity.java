@@ -141,6 +141,7 @@ public class SignalActivity extends Activity implements LocationListener {
             locationMap.put("bearing", String.valueOf(location.getBearing()));
             locationMap.put("signalType", String.valueOf(signalType.toInt()));
             locationMap.put("deviceID", String.valueOf(deviceID));
+            locationMap.put("dateTime", String.valueOf(System.currentTimeMillis()));
             JSONObject locationJsonObject = new JSONObject(locationMap);
             String locationJson = locationJsonObject.toString();
             wv.loadUrl("javascript:doSend('" + locationJson + "')");
