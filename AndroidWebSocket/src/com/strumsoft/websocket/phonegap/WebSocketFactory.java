@@ -109,7 +109,8 @@ public class WebSocketFactory {
             if (oldHazardSignal == null) {
                 hazardSignalList.add(hazardSignal);
             } else {
-                oldHazardSignal = hazardSignal;
+                hazardSignalList.remove(oldHazardSignal);
+                hazardSignalList.add(hazardSignal);
             }
             Log.d("HazardList", "Hazard List Size: " + hazardSignalList.size());
         }
@@ -121,7 +122,7 @@ public class WebSocketFactory {
 
     public HazardSignal selectHazardSignalByDeviceID(UUID deviceID){
         for(int i = 0; i < hazardSignalList.size(); i++){
-            if(hazardSignalList.get(i).deviceID == deviceID){
+            if(hazardSignalList.get(i).deviceID.toString().equalsIgnoreCase(deviceID.toString())){
                 return hazardSignalList.get(i);
             }
         }
@@ -130,7 +131,7 @@ public class WebSocketFactory {
 
     public List<HazardSignal> getHazardSignals(){
         for(int i = 0; i < hazardSignalList.size(); i++){
-            if(System.currentTimeMillis() - hazardSignalList.get(i).dateTime > 100000){
+            if(System.currentTimeMillis() - hazardSignalList.get(i).dateTime > 90000){
                 hazardSignalList.remove(i);
             }
         }
