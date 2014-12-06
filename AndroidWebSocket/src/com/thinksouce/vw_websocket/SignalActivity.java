@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 public class SignalActivity extends Activity implements LocationListener {
     private TextView latitudeField;
     private TextView longitudeField;
+    private TextView directionField;
     private LocationManager locationManager;
     private String provider;
     private WebView wv;
@@ -70,7 +71,7 @@ public class SignalActivity extends Activity implements LocationListener {
         wv.setVisibility(View.GONE);
         latitudeField = (TextView) findViewById(R.id.TextView02);
         longitudeField = (TextView) findViewById(R.id.TextView04);
-        //directionField = (TextView) findViewById(R.id.TextView06);
+        directionField = (TextView) findViewById(R.id.TextView06);
         // Get the location manager
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // Define the criteria how to select the location provider -> use
@@ -131,8 +132,12 @@ public class SignalActivity extends Activity implements LocationListener {
             //or the signal phone has moved 10 meters since last broadcast
             double lat = (double) (location.getLatitude());
             double lng = (double) (location.getLongitude());
+            double brng = (double) (location.getBearing());
             latitudeField.setText(String.valueOf(lat));
             longitudeField.setText(String.valueOf(lng));
+            directionField.setText(String.valueOf(brng));
+            double spd = (double) (location.getSpeed());
+            braking(spd);
             Toast.makeText(this, "Current speed:" + location.getSpeed(), Toast.LENGTH_SHORT).show();
             HashMap<String, String> locationMap = new HashMap<String, String>();
             locationMap.put("latitude", String.valueOf(location.getLatitude()));
@@ -147,6 +152,12 @@ public class SignalActivity extends Activity implements LocationListener {
             wv.loadUrl("javascript:doSend('" + locationJson + "')");
             lastBroadcastedLocation = location;
         }
+    }
+
+    //determine the distance needed to go to a complete stop based on the speed of the driver
+    public void braking (double speed){
+        double brakingDistance = (1.47*speed*2.5) + ((1.075 * Math.pow(speed,2))/11.2);
+        Toast.makeText(this, "Braking distance " + brakingDistance +" feet",Toast.LENGTH_SHORT).show();
     }
 
 
@@ -169,16 +180,6 @@ public class SignalActivity extends Activity implements LocationListener {
                 Toast.LENGTH_SHORT).show();
     }
 
-    protected static double bearing(double lat1, double lon1, double lat2, double lon2){
-        double longitude1 = lon1;
-        double longitude2 = lon2;
-        double latitude1 = Math.toRadians(lat1);
-        double latitude2 = Math.toRadians(lat2);
-        double longDiff= Math.toRadians(longitude2-longitude1);
-        double y= Math.sin(longDiff)*Math.cos(latitude2);
-        double x=Math.cos(latitude1)*Math.sin(latitude2)-Math.sin(latitude1)*Math.cos(latitude2)*Math.cos(longDiff);
-        return (Math.toDegrees(Math.atan2(y, x))+360)%360;
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

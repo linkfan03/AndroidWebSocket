@@ -13,8 +13,9 @@
     android:id="@+id/linearLayout1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="40dip"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:layout_below="@+id/linearLayout2"
+    android:layout_alignParentLeft="true">
 
     <TextView
         android:id="@+id/TextView01"
@@ -61,11 +62,12 @@
     </TextView>
 
 </LinearLayout>
-<!--
+
 <LinearLayout
     android:id="@+id/linearLayout3"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="match_parent"
+    android:layout_below="@+id/linearLayout1">
 
     <TextView
         android:id="@+id/TextView05"
@@ -90,7 +92,8 @@
         android:id="@+id/webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/linearLayout3"
         android:text="@string/hello_world"
         tools:context=".SignalActivity" />
-<!--</LinearLayout>-->
+</LinearLayout>
 </RelativeLayout>

@@ -25,4 +25,14 @@ public class HazardSignal {
     public SignalType signalType;
     public UUID deviceID;
     public long dateTime;
+
+    public void warnLocation(){
+
+    }
+    public void warnBearing(){
+
+    }
+    public void warnSpeed(){
+
+    }
 }
