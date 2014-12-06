@@ -25,6 +25,7 @@ public class HazardSignal {
     public SignalType signalType;
     public UUID deviceID;
     public long dateTime;
+    public long lastWarnedTime;
 
     public void warnLocation(){
 

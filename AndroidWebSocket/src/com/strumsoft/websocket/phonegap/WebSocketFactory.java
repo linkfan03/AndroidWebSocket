@@ -138,43 +138,6 @@ public class WebSocketFactory {
         return hazardSignalList;
     }
 
-    public void addToHazardSignalList(String hazardSignalJSON) throws JSONException{
-        try {
-            JSONObject jsonObject = new JSONObject(hazardSignalJSON);
-            HazardSignal hazardSignal = new HazardSignal(jsonObject);
-            HazardSignal oldHazardSignal = selectHazardSignalByDeviceID(hazardSignal.deviceID);
-            if (oldHazardSignal == null) {
-                hazardSignalList.add(hazardSignal);
-            } else {
-                hazardSignalList.remove(oldHazardSignal);
-                hazardSignalList.add(hazardSignal);
-            }
-            Log.d("HazardList", "Hazard List Size: " + hazardSignalList.size());
-        }
-        catch (Exception exception){
-            //don't crash
-            Log.d("HazardList", exception.getMessage());
-        }
-    }
-
-    public HazardSignal selectHazardSignalByDeviceID(UUID deviceID){
-        for(int i = 0; i < hazardSignalList.size(); i++){
-            if(hazardSignalList.get(i).deviceID.toString().equalsIgnoreCase(deviceID.toString())){
-                return hazardSignalList.get(i);
-            }
-        }
-        return null;
-    }
-
-    public List<HazardSignal> getHazardSignals(){
-        for(int i = 0; i < hazardSignalList.size(); i++){
-            if(System.currentTimeMillis() - hazardSignalList.get(i).dateTime > 90000){
-                hazardSignalList.remove(i);
-            }
-        }
-        return hazardSignalList;
-    }
-
     /** Show a toast from the web page */
     @JavascriptInterface//You have to have this for the javascript to be able to call the method
     public void showToast(String toast) {
