@@ -71,6 +71,10 @@ public class DriverActivity extends Activity implements LocationListener {
         if (location != null) {
             System.out.println("Provider " + provider + " has been selected.");
             onLocationChanged(location);
+            driverLocation = location;
+            Location bicycleRider = createNewLocationDistanceAway(10, driverLocation);
+            Location roadWorker = createNewLocationDistanceAway(50, driverLocation);
+            Location student = createNewLocationDistanceAway(30, driverLocation);
             // get rid of bottom line to fix
             //Toast.makeText(context, "Current Speed:" + location.getSpeed(), Toast.LENGTH_SHORT).show();
         }
@@ -97,6 +101,14 @@ public class DriverActivity extends Activity implements LocationListener {
         super.onResume();
         locationManager.requestLocationUpdates(provider, 400, 1, this);
 
+    }
+
+    public Location createNewLocationDistanceAway(float distance, Location originalLocation){
+        Location newLocation = new Location(originalLocation);
+        while(newLocation.distanceTo(originalLocation) < distance){
+            newLocation.setLatitude(newLocation.getLatitude() + (1/110500));
+        }
+        return newLocation;
     }
 
     public void CheckNewHazards(){
@@ -173,7 +185,7 @@ public class DriverActivity extends Activity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        driverLocation = location;
+        //driverLocation = location;
     }
 
     @Override
